@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "666275365147",
+    "project_id": "pricelist-shambhavi",
+    "storage_bucket": "pricelist-shambhavi.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:666275365147:android:362ca65341f0c0f0afd3be",
+        "android_client_info": {
+          "package_name": "pricelist.shambhavi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9ib3Ytk1Qmuch-eF9cFa1tWeMCiRTj6c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

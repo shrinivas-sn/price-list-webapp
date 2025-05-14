@@ -1,0 +1,24 @@
+/* General styling for form controls to ensure visibility */
+.form-control {
+    background-color: #ffffff !important; /* White background */
+    border: 1px solid #ced4da !important; /* Standard light grey border (like Bootstrap's default) */
+    color: #212529 !important;           /* Dark text for readability */
+    box-shadow: none !important;          /* Remove any theme box-shadow that might make it blend */
+    /* The theme or Bootstrap already provides padding, but you can adjust if needed: */
+    /* padding: 0.375rem 0.75rem; */
+}
+
+/* Ensure textarea also gets these styles if not fully covered or needs tweaks */
+textarea.form-control {
+    /* Most styles will be inherited from .form-control above,
+       but you can add specific textarea overrides here if needed, e.g., for height.
+       For now, the above should cover background, border, color. */
+}
+
+/* Focus styles for all form controls */
+.form-control:focus {
+    border-color: #86b7fe !important; /* Highlight border color on focus (Bootstrap blue) */
+    outline: 0 !important;            /* Remove default browser outline */
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important; /* Glow effect on focus (Bootstrap style) */
+    background-color: #ffffff !important; /* Ensure background stays consistent on focus */
+}

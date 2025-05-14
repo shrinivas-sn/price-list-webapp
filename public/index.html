@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grocery Price List</title>
+    <link href="material-dashboard.css" rel="stylesheet">
+    <link href="material-dashboard.min.css" rel="stylesheet">
+    <link href="nucleo-icons.css" rel="stylesheet">
+    <link href="nucleo-svg.css" rel="stylesheet">
+    <link href="test-box.css" rel="stylesheet">
+    <style>
+        /* --- Base and Utility Styles --- */
+        body {
+            padding: 0;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        .app-container {
+            margin: 0 auto;
+            padding: 15px;
+            min-height: 100vh;
+            max-width: 1200px;
+        }
+        #search-container, .form-section {
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        details summary {
+            cursor: pointer;
+            font-weight: bold;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        #auth-container-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+            padding: 20px;
+        }
+        #user-bar h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        #user-menu-dropdown-container {
+            position: relative;
+            display: inline-block;
+        }
+        #user-email-display-dropdown {
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        .tab-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding: 5px 5px 0 5px;
+        }
+        .tab-button {
+            padding: 10px 15px;
+            cursor: pointer;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s, color 0.3s;
+            border-radius: 0.25rem 0.25rem 0 0;
+        }
+        .tab-content {
+            display: none;
+            padding: 0;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        #auth-error {
+            font-weight: bold;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        /* --- Table Styles --- */
+        .table-responsive-container {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        #product-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.95rem;
+        }
+        #product-table thead th {
+            padding: 0.75rem;
+            text-align: left;
+            vertical-align: bottom;
+            border-bottom: 2px solid rgba(0,0,0,0.1);
+            white-space: nowrap;
+            background-color: #f8f9fa;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        #product-table tbody td {
+            padding: 0.75rem;
+            vertical-align: middle;
+        }
+        #product-table tbody tr.main-product-row td {
+             border-top: 1px solid rgba(0,0,0,0.1);
+        }
+        #product-table tbody tr.main-product-row:first-child td {
+            border-top: none;
+        }
+        #product-table tbody tr.main-product-row:hover {
+            background-color: rgba(0,0,0,0.02);
+        }
+        #product-table td .cell-value {
+            display: inline;
+        }
+        .product-name-cell {
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .product-name-cell:hover {
+            color: #0d6efd;
+        }
+        .product-price-cell {
+            font-weight: bold;
+            color: #0d6efd;
+        }
+        .actions-cell-mobile .btn {
+            margin: 2px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.85rem;
+        }
+        .cost-price-row td {
+            background-color: #fdfdfd; /* Lighter than #fcfcfc for subtle difference */
+            padding: 0.6rem 0.75rem 0.6rem 1.5rem;
+            font-size: 0.88em;
+            border-top: 1px dashed rgba(0,0,0,0.08);
+            line-height: 1.6;
+        }
+        .cost-price-row td div {
+            margin-bottom: 0.25rem;
+        }
+        .cost-price-row td div:last-child {
+            margin-bottom: 0;
+        }
+
+
+        /* --- Form Control Fixes (if using custom-fixes.css, put these there) --- */
+        .form-control {
+            background-color: #ffffff !important;
+            border: 1px solid #ced4da !important;
+            color: #212529 !important;
+            box-shadow: none !important;
+        }
+        .form-control:focus {
+            border-color: #86b7fe !important;
+            outline: 0 !important;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+            background-color: #ffffff !important;
+        }
+
+
+        /* --- MOBILE RESPONSIVE STYLES --- */
+        @media (max-width: 767.98px) {
+            .app-container { padding: 10px; }
+            #product-table { font-size: 0.85rem; }
+            #product-table thead th,
+            #product-table tbody td {
+                padding: 0.5rem 0.3rem;
+                white-space: nowrap;
+            }
+            #product-table thead th:nth-child(1),
+            #product-table td.product-name-cell {
+                white-space: normal;
+                word-break: break-word;
+                min-width: 120px;
+            }
+            #product-table td.product-price-cell .cell-value,
+            #product-table td.product-category-cell .cell-value {
+                 display: block;
+            }
+             #product-table td.product-price-cell .cell-value {
+                text-align: right;
+            }
+            .cost-price-row td {
+                padding: 0.4rem 0.5rem 0.4rem 1rem;
+                font-size: 0.8em;
+                white-space: normal;
+            }
+            .tab-button { padding: 8px 12px; font-size: 0.9rem; }
+            #user-bar .navbar-brand { font-size: 1.2rem; }
+            #search-container { padding: 10px; }
+            #search-input { font-size: 0.9rem; }
+            .form-section .form-control, .form-section .btn {
+                font-size: 0.9rem;
+                padding: 0.375rem 0.75rem;
+            }
+            .btn { padding: 0.375rem 0.75rem; font-size: 0.9rem; }
+            .actions-cell-mobile .btn {
+                 padding: 0.2rem 0.4rem;
+                 font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #product-table { font-size: 0.8rem; }
+            #product-table thead th,
+            #product-table tbody td { padding: 0.4rem 0.2rem; }
+            #product-table thead th:nth-child(1),
+            #product-table td.product-name-cell { min-width: 100px; }
+            .cost-price-row td { font-size: 0.75em; padding: 0.3rem 0.4rem 0.3rem 0.8rem;}
+            .tab-button { padding: 6px 10px; font-size: 0.8rem; }
+            .actions-cell-mobile .btn {
+                padding: 0.2rem 0.3rem;
+                font-size: 0.75rem;
+                margin: 1px;
+            }
+            #product-name, #cost-price, #selling-price, #category { font-size: 0.9rem; }
+        }
+
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .app-container { padding: 20px; }
+            #product-table { font-size: 1rem; }
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+    <div id="auth-container-wrapper">
+        <div id="auth-container" class="card shadow-lg" style="width: 100%; max-width: 420px;">
+            <div class="card-body p-4 p-md-5">
+                <h2 class="card-title text-center fw-bold mb-4">Login / Sign Up</h2>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email:</label>
+                    <input type="email" class="form-control form-control-lg" id="email" placeholder="Enter your email">
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password:</label>
+                    <input type="password" class="form-control form-control-lg" id="password" placeholder="Enter your password (min. 6 characters)">
+                </div>
+                <div class="d-grid gap-2 mb-3">
+                    <button type="button" class="btn btn-primary btn-lg" onclick="handleLogin()">Log In</button>
+                    <button type="button" class="btn btn-success btn-lg" onclick="handleSignUp()">Sign Up</button>
+                </div>
+                <p id="auth-error" class="text-danger mt-2 text-center" style="min-height: 1.2em;"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-shell" style="display: none;">
+        <nav id="user-bar" class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+            <div class="container-fluid">
+                <h1 class="navbar-brand mb-0">Grocery Price List</h1>
+                <div id="user-menu-dropdown-container" class="dropdown">
+                    <button id="user-menu-button" class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        &#9776; Menu
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="user-menu-button">
+                        <li><div id="user-email-display-dropdown" class="dropdown-item-text">Logged in as: <span id="user-email"></span></div></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><button id="logout-button-dropdown" class="dropdown-item" type="button">Log Out</button></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container app-container">
+            <ul class="nav nav-tabs tab-buttons mb-3">
+                <li class="nav-item">
+                    <button class="nav-link tab-button active" onclick="openTab(event, 'tab-product-list')">Product List & Search</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link tab-button" onclick="openTab(event, 'tab-add-import')">Add / Import Products</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link tab-button" onclick="openTab(event, 'tab-calculator')">Unit Calculator</button>
+                </li>
+            </ul>
+
+            <div id="tab-product-list" class="tab-content active">
+                <div id="search-container" class="mb-3 p-3 card">
+                    <label for="search-input" class="form-label">Search Products (Live):</label>
+                    <div class="input-group">
+                        <input type="text" id="search-input" class="form-control form-control-lg" placeholder="Enter product name or category">
+                        <button class="btn btn-info" type="button" onclick="performSearchNow()">Search</button>
+                        <button class="btn btn-danger" type="button" onclick="resetSearch()">Show All</button>
+                    </div>
+                </div>
+                <h2 class="mt-4">Product List</h2>
+                <div class="table-responsive-container">
+                    <table id="product-table" class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col" style="width: 35%;">Product Name</th>
+                                <th scope="col" style="width: 20%; text-align: right;">Selling Price</th>
+                                <th scope="col" style="width: 25%;">Category</th>
+                                <th scope="col" style="width: 20%; text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="product-list">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-add-import" class="tab-content">
+                <div class="form-section card mb-4">
+                    <div class="card-body">
+                        <details id="add-product-section" open> <summary class="h5 card-title">Add New Product</summary>
+                            <div class="mt-3">
+                                <div class="mb-3">
+                                    <label for="product-name" class="form-label">Product Name:</label>
+                                    <input type="text" id="product-name" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="cost-price" class="form-label">Cost Price:</label>
+                                    <input type="number" id="cost-price" class="form-control" step="0.01">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="selling-price" class="form-label">Selling Price:</label>
+                                    <input type="number" id="selling-price" class="form-control" required step="0.01">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="category" class="form-label">Category:</label>
+                                    <input type="text" id="category" class="form-control">
+                                </div>
+                                <button type="button" class="btn btn-primary" onclick="addProduct()">Add Product</button>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+                <div class="form-section card">
+                     <div class="card-body">
+                        <details id="bulk-import-section" open> <summary class="h5 card-title">Bulk Import Products (Text/CSV)</summary>
+                            <div class="mt-3">
+                                <label for="bulk-import-data" class="form-label">Paste product data (Format: <code>Name, Cost Price, Selling Price, Category</code>):</label>
+                                <textarea id="bulk-import-data" class="form-control" rows="5" placeholder="Example:
+Laptop, 500, 700, Electronics
+Rice, 50, 60, Grocery"></textarea>
+                                <button class="btn btn-success mt-2" onclick="bulkImportProducts()">Import Products</button>
+                                <p id="bulk-import-status" class="mt-2"></p>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-calculator" class="tab-content card p-3">
+                <h2 class="card-title">Unit Price Calculator</h2>
+                <p class="card-text">This feature is coming soon!</p>
+                <p class="card-text">Here you will be able to select a product and calculate price based on desired weight/monetary value, or vice-versa.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let products = [];
+        let currentOpenTab = 'tab-product-list';
+
+        // Helper function to format Firestore Timestamps or JS Date objects
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return 'N/A';
+            let date;
+            if (timestamp.toDate) { // Firestore Timestamp object
+                date = timestamp.toDate();
+            } else if (timestamp instanceof Date) { // JavaScript Date object
+                date = timestamp;
+            } else {
+                return 'Invalid Date';
+            }
+            // Format: May 13, 2025, 6:01 PM
+            return date.toLocaleString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
+        }
+
+
+        function handleSignUp() {
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const errorP = document.getElementById('auth-error');
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            errorP.textContent = '';
+            if (!email || !password) { errorP.textContent = 'Please enter both email and password.'; return; }
+            if (password.length < 6) { errorP.textContent = 'Password must be at least 6 characters long.'; return; }
+            window.auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => { console.log("Sign up successful:", userCredential.user.uid); })
+                .catch((error) => { console.error("Sign up failed:", error.code, error.message); errorP.textContent = `Sign up failed: ${error.message}`; });
+        }
+
+        function handleLogin() {
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const errorP = document.getElementById('auth-error');
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            errorP.textContent = '';
+            if (!email || !password) { errorP.textContent = 'Please enter both email and password.'; return; }
+            window.auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => { console.log("Log in successful:", userCredential.user.uid); })
+                .catch((error) => { console.error("Log in failed:", error.code, error.message); errorP.textContent = `Log in failed: ${error.message}`; });
+        }
+
+        function handleLogout() {
+            window.auth.signOut()
+                .then(() => { console.log("Log out successful."); })
+                .catch((error) => { console.error("Log out failed:", error); alert(`Logout failed: ${error.message}`); });
+        }
+
+        function loadProductsFromFirestore() {
+            if (!window.currentUser) { renderProductList([]); return; }
+            if (!window.db) { console.error("DB not init!"); alert("DB not ready."); return; }
+            const path = `users/${window.currentUser.uid}/products`;
+            const ref = window.db.collection(path).orderBy("name"); // Or orderBy("lastEditedAt", "desc") for most recent
+            ref.onSnapshot(snapshot => {
+                let firestoreProducts = [];
+                snapshot.forEach(doc => {
+                    firestoreProducts.push({ ...doc.data(), firestoreId: doc.id });
+                });
+                products = firestoreProducts;
+                _performSearchLogic();
+            }, error => {
+                console.error("Fetch error: ", error);
+                alert("Error loading product list.");
+                renderProductList([]);
+            });
+        }
+
+        function renderProductList(productsToRender) {
+            const productListBody = document.getElementById('product-list');
+            if (!productListBody) return;
+            productListBody.innerHTML = '';
+
+            if (!Array.isArray(productsToRender) || productsToRender.length === 0) {
+                const searchInputElement = document.getElementById('search-input');
+                const message = searchInputElement && searchInputElement.value ? 'No products match your search.' : 'Loading or no products added yet...';
+                const colspan = document.querySelectorAll("#product-table thead th").length || 4;
+                productListBody.innerHTML = `<tr><td colspan="${colspan}" class="text-center">${message}</td></tr>`;
+                return;
+            }
+
+            productsToRender.forEach((product, index) => {
+                const currentId = product.firestoreId;
+                if (!currentId) { console.warn("Product missing ID:", product); return; }
+
+                const collapseId = `details-${currentId}-${index}`; // Unique ID for the collapsible element
+
+                // Main product row
+                const mainRow = productListBody.insertRow();
+                mainRow.id = `product-row-${currentId}-${index}`;
+                mainRow.classList.add('main-product-row');
+
+                // Product Name Cell (acts as trigger)
+                let cellName = mainRow.insertCell();
+                cellName.classList.add('product-name-cell');
+                cellName.setAttribute('data-bs-toggle', 'collapse');
+                cellName.setAttribute('data-bs-target', `#${collapseId}`);
+                cellName.setAttribute('aria-expanded', 'false');
+                cellName.setAttribute('aria-controls', collapseId);
+                let nameValue = document.createElement('span');
+                nameValue.classList.add('cell-value');
+                nameValue.textContent = product.name;
+                cellName.appendChild(nameValue);
+
+                // Selling Price
+                let cellSellingPrice = mainRow.insertCell();
+                cellSellingPrice.classList.add('product-price-cell');
+                let priceValue = document.createElement('span');
+                priceValue.classList.add('cell-value');
+                priceValue.textContent = `₹ ${(typeof product.sellingPrice === 'number') ? product.sellingPrice.toFixed(2) : 'N/A'}`;
+                cellSellingPrice.appendChild(priceValue);
+
+                // Category
+                let cellCategory = mainRow.insertCell();
+                cellCategory.classList.add('product-category-cell');
+                let categoryValue = document.createElement('span');
+                categoryValue.classList.add('cell-value');
+                categoryValue.textContent = product.category || 'N/A';
+                cellCategory.appendChild(categoryValue);
+
+                // Actions Cell
+                const actionsCell = mainRow.insertCell();
+                actionsCell.classList.add('actions-cell-mobile');
+                actionsCell.style.textAlign = 'center';
+
+                const btnEdit = document.createElement('button');
+                btnEdit.classList.add('btn', 'btn-sm', 'btn-outline-warning', 'me-1');
+                btnEdit.textContent = 'Edit';
+                btnEdit.onclick = (e) => {
+                    e.stopPropagation(); // Prevent collapse toggle
+                    editProduct(currentId);
+                };
+                actionsCell.appendChild(btnEdit);
+
+                const btnDelete = document.createElement('button');
+                btnDelete.classList.add('btn', 'btn-sm', 'btn-outline-danger');
+                btnDelete.textContent = 'Delete';
+                btnDelete.onclick = (e) => {
+                    e.stopPropagation(); // Prevent collapse toggle
+                    deleteProduct(currentId);
+                };
+                actionsCell.appendChild(btnDelete);
+
+                // Collapsible row for Cost Price and Timestamps
+                const detailRow = productListBody.insertRow();
+                detailRow.classList.add('collapse', 'cost-price-row'); // 'cost-price-row' for styling
+                detailRow.id = collapseId;
+
+                let detailCell = detailRow.insertCell();
+                detailCell.colSpan = 4; // Span across all columns
+
+                const costPriceText = `<strong>Cost Price:</strong> ₹ ${(typeof product.costPrice === 'number') ? product.costPrice.toFixed(2) : 'N/A'}`;
+                const createdAtText = `<strong>Created:</strong> ${formatTimestamp(product.createdAt)}`;
+                const lastEditedAtText = `<strong>Last Edited:</strong> ${formatTimestamp(product.lastEditedAt)}`;
+
+                detailCell.innerHTML = `
+                    <div>${costPriceText}</div>
+                    <div>${createdAtText}</div>
+                    <div>${lastEditedAtText}</div>
+                `;
+            });
+        }
+
+        function addProduct() {
+            const productNameInput = document.getElementById('product-name');
+            const costPriceInput = document.getElementById('cost-price');
+            const sellingPriceInput = document.getElementById('selling-price');
+            const categoryInput = document.getElementById('category');
+
+            const name = productNameInput.value.trim();
+            const sellingPrice = sellingPriceInput.value;
+
+            if (!name || !sellingPrice) {
+                alert('Product Name and Selling Price are required.');
+                return;
+            }
+            const sellingPriceNum = parseFloat(sellingPrice);
+            if (isNaN(sellingPriceNum)) {
+                alert('Selling Price must be a valid number.');
+                return;
+            }
+
+            if (!window.currentUser || !window.db) {
+                alert("Not logged in or database not initialized.");
+                return;
+            }
+
+            const now = new Date(); // Get current timestamp
+
+            const newProduct = {
+                name: name,
+                costPrice: parseFloat(costPriceInput.value) || 0,
+                sellingPrice: sellingPriceNum,
+                category: categoryInput.value.trim() || 'Uncategorized',
+                createdAt: now,      // Add createdAt timestamp
+                lastEditedAt: now    // Add lastEditedAt timestamp
+            };
+
+            const path = `users/${window.currentUser.uid}/products`;
+            window.db.collection(path).add(newProduct)
+                .then((docRef) => {
+                    console.log("Product added with ID: ", docRef.id);
+                    productNameInput.value = '';
+                    costPriceInput.value = '';
+                    sellingPriceInput.value = '';
+                    categoryInput.value = '';
+                }).catch((error) => {
+                    console.error("Error adding product: ", error);
+                    alert(`Failed to add product.\nError: ${error.message}`);
+                });
+        }
+
+        function editProduct(productId) {
+            const product = products.find(p => p.firestoreId === productId);
+            if (!product) {
+                alert("Product not found for editing.");
+                return;
+            }
+            if (!window.currentUser || !window.db) {
+                alert("Not logged in or database not initialized.");
+                return;
+            }
+
+            const newName = prompt(`Enter new product name (current: ${product.name}):`, product.name);
+            if (newName === null) return; // User cancelled
+            const updatedName = newName.trim();
+            if (updatedName === '') {
+                alert("Product name cannot be empty.");
+                return;
+            }
+
+            const newCostPriceStr = prompt(`Enter new cost price (current: ${product.costPrice || 0}):`, product.costPrice || 0);
+            if (newCostPriceStr === null) return;
+            const updatedCostPrice = parseFloat(newCostPriceStr);
+            if (isNaN(updatedCostPrice)) {
+                alert("Invalid cost price entered.");
+                return;
+            }
+
+            const newSellingPriceStr = prompt(`Enter new selling price (current: ${product.sellingPrice}):`, product.sellingPrice);
+            if (newSellingPriceStr === null) return;
+            const updatedSellingPrice = parseFloat(newSellingPriceStr);
+            if (isNaN(updatedSellingPrice)) {
+                alert("Invalid selling price entered.");
+                return;
+            }
+
+            const newCategory = prompt(`Enter new category (current: ${product.category || ''}):`, product.category || '');
+            if (newCategory === null) return;
+
+
+            const updateData = {
+                name: updatedName,
+                costPrice: updatedCostPrice,
+                sellingPrice: updatedSellingPrice,
+                category: newCategory.trim() || 'Uncategorized',
+                lastEditedAt: new Date() // Update lastEditedAt timestamp
+            };
+
+            const path = `users/${window.currentUser.uid}/products/${productId}`;
+            window.db.doc(path).update(updateData)
+                .then(() => {
+                    console.log("Product updated successfully.");
+                })
+                .catch((error) => {
+                    console.error("Error updating product: ", error);
+                    alert(`Failed to update product.\nError: ${error.message}`);
+                });
+        }
+
+        function deleteProduct(productId) {
+            const product = products.find(p => p.firestoreId === productId);
+            if (!product) { alert("Product not found."); return; }
+            if (!window.currentUser || !window.db) { alert("Not logged in or connected."); return; }
+            if (confirm(`Are you sure you want to delete "${product.name}"?`)) {
+                const path = `users/${window.currentUser.uid}/products/${productId}`;
+                window.db.doc(path).delete().catch((error) => { alert(`Failed delete.\nError: ${error.message}`); });
+            }
+        }
+
+        function debounce(func, delay) {
+            let timeout;
+            return function(...args) { const context = this; clearTimeout(timeout); timeout = setTimeout(() => func.apply(context, args), delay); };
+        }
+
+        function _performSearchLogic() {
+            const searchInputElement = document.getElementById('search-input');
+            if (!searchInputElement) return;
+            const searchInputVal = searchInputElement.value.toLowerCase().trim();
+            if (!searchInputVal) { renderProductList(products); return; }
+            const searchResults = products.filter(p => (p.name && p.name.toLowerCase().includes(searchInputVal)) || (p.category && p.category.toLowerCase().includes(searchInputVal)));
+            renderProductList(searchResults);
+        }
+        function performSearchNow() { _performSearchLogic(); }
+        function resetSearch() {
+            const searchInputElem = document.getElementById('search-input');
+            if (searchInputElem) searchInputElem.value = '';
+            _performSearchLogic();
+        }
+
+        function bulkImportProducts() {
+            const importText = document.getElementById('bulk-import-data').value.trim();
+            const statusEl = document.getElementById('bulk-import-status');
+            if (!importText) { statusEl.textContent = "Please paste product data first."; statusEl.style.color = "red"; return; }
+            if (!window.currentUser || !window.db) { statusEl.textContent = "Not logged in or connected."; statusEl.style.color = "red"; return; }
+
+            const lines = importText.split('\n').filter(line => line.trim() !== '');
+            const productsToAdd = [];
+            let parseErrors = [];
+            const now = new Date(); // Timestamp for all imported products
+
+            for (const line of lines) {
+                const parts = line.split(',').map(part => part.trim());
+                if (parts.length < 3) { parseErrors.push(`Skipping incomplete line: ${line}`); continue; }
+                const name = parts[0];
+                const costPrice = parseFloat(parts[1]);
+                const sellingPrice = parseFloat(parts[2]);
+                const category = parts[3] || 'Uncategorized';
+                if (!name || isNaN(sellingPrice)) { parseErrors.push(`Skipping invalid data: ${line}`); continue; }
+                productsToAdd.push({
+                    name,
+                    costPrice: isNaN(costPrice) ? 0 : costPrice,
+                    sellingPrice,
+                    category,
+                    createdAt: now,
+                    lastEditedAt: now
+                });
+            }
+             if (parseErrors.length > 0) {
+                alert("Some lines had parsing errors and were skipped:\n" + parseErrors.join("\n") + "\n\nContinuing with valid products if any.");
+            }
+            if (productsToAdd.length === 0) { statusEl.textContent = "No valid products found to import."; statusEl.style.color = "orange"; return; }
+            statusEl.textContent = `Adding ${productsToAdd.length} products...`; statusEl.style.color = "blue";
+
+            const path = `users/${window.currentUser.uid}/products`;
+            const batch = window.db.batch();
+            const collectionRef = window.db.collection(path);
+            productsToAdd.forEach(product => {
+                const docRef = collectionRef.doc(); // Auto-generate ID
+                batch.set(docRef, product);
+            });
+            batch.commit()
+                .then(() => {
+                    statusEl.textContent = `Successfully added ${productsToAdd.length} products!`;
+                    statusEl.style.color = "green";
+                    document.getElementById('bulk-import-data').value = '';
+                })
+                .catch(error => {
+                    statusEl.textContent = `Error importing products: ${error.message}`;
+                    statusEl.style.color = "red";
+                });
+        }
+
+        function openTab(event, tabName) {
+            currentOpenTab = tabName;
+            let i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+                tabcontent[i].classList.remove("active");
+            }
+            tablinks = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            const activeTabContent = document.getElementById(tabName);
+            if(activeTabContent) {
+                activeTabContent.style.display = "block";
+                activeTabContent.classList.add("active");
+            }
+            if (event && event.currentTarget) {
+                 event.currentTarget.classList.add("active");
+            }
+            if (tabName === 'tab-product-list') {
+                _performSearchLogic(); // Refresh list when switching to product tab
+            }
+        }
+
+        function setupUserDropdown() {
+            const logoutButton = document.getElementById('logout-button-dropdown');
+            if (logoutButton) {
+                logoutButton.onclick = function() {
+                    handleLogout();
+                }
+            }
+        }
+
+       const firebaseConfig = {
+  apiKey: "AIzaSyB6JOeZIqHgLSLRmUqDV2vhK3jUDPmeOTc",
+  authDomain: "pricelist-shambhavi.firebaseapp.com",
+  projectId: "pricelist-shambhavi",
+  storageBucket: "pricelist-shambhavi.firebasestorage.app",
+  messagingSenderId: "666275365147",
+  appId: "1:666275365147:web:8d410e831ffa5a8aafd3be",
+  measurementId: "G-PLDZFR803X"
+        };
+
+        // Initialize Firebase
+        try {
+            firebase.initializeApp(firebaseConfig);
+            window.auth = firebase.auth();
+            window.db = firebase.firestore();
+            window.currentUser = null;
+            console.log("Firebase Initialized!");
+        } catch (e) {
+            console.error("Error initializing Firebase. Please check your config:", e);
+            alert("Could not initialize Firebase. Please check your configuration and try again.");
+        }
+
+
+        window.auth.onAuthStateChanged(user => {
+            const authContainerWrapper = document.getElementById('auth-container-wrapper');
+            const appShell = document.getElementById('app-shell');
+            const userEmailSpan = document.getElementById('user-email');
+            if (user) {
+                window.currentUser = user;
+                if(authContainerWrapper) authContainerWrapper.style.display = 'none';
+                if(appShell) appShell.style.display = 'block';
+                if(userEmailSpan) userEmailSpan.textContent = user.email;
+                loadProductsFromFirestore();
+                setupUserDropdown();
+
+                const tabToOpen = document.getElementById(currentOpenTab) ? currentOpenTab : 'tab-product-list';
+                const activeTabButton = document.querySelector(`.tab-button[onclick*="'${tabToOpen}'"]`);
+                if (activeTabButton) {
+                   activeTabButton.click();
+                } else {
+                    const defaultButton = document.querySelector('.tab-button[onclick*="\'tab-product-list\'"]');
+                    if(defaultButton) defaultButton.click();
+                }
+            } else {
+                window.currentUser = null;
+                if(authContainerWrapper) authContainerWrapper.style.display = 'flex';
+                if(appShell) appShell.style.display = 'none';
+                if(userEmailSpan) userEmailSpan.textContent = '';
+                products = [];
+                const productListBody = document.getElementById('product-list');
+                if (productListBody) productListBody.innerHTML = '';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const searchInputElem = document.getElementById('search-input');
+            if (searchInputElem) {
+                const debouncedSearchHandler = debounce(_performSearchLogic, 300);
+                searchInputElem.addEventListener('input', debouncedSearchHandler);
+            }
+            // Ensure a tab is active on initial load if user is not logged in (auth state will handle for logged in)
+            if (!window.auth.currentUser) {
+                const anyActiveTabButton = document.querySelector('.tab-button.active');
+                 if (!anyActiveTabButton) {
+                    const defaultTabButton = document.querySelector('.tab-button[onclick*="\'tab-product-list\'"]');
+                    if (defaultTabButton) {
+                       defaultTabButton.click(); // This will call openTab
+                    }
+                }
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>
